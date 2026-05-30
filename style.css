@@ -246,3 +246,32 @@ td {
     grid-column: span 3;
   }
 }
+
+
+/* =========================
+   v11 損益率ソート・スマホボタン配置
+========================= */
+
+@media screen and (max-width: 768px) {
+  #sortBuyDateBtn,
+  #sortCodeBtn,
+  #sortProfitRateBtn {
+    grid-column: span 1;
+    font-size: 11px;
+    padding: 6px 2px;
+  }
+
+  #importFile,
+  #exportBtn,
+  #clearAllBtn {
+    grid-column: span 1;
+    width: 100%;
+    min-width: 0;
+    font-size: 11px;
+    padding: 6px 2px;
+  }
+
+  #importFile {
+    font-size: 10px;
+  }
+}

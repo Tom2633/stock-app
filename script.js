@@ -5,6 +5,7 @@ const exportBtn = document.getElementById("exportBtn");
 const importFile = document.getElementById("importFile");
 const sortBuyDateBtn = document.getElementById("sortBuyDateBtn");
 const sortCodeBtn = document.getElementById("sortCodeBtn");
+const sortProfitRateBtn = document.getElementById("sortProfitRateBtn");
 const clearAllBtn = document.getElementById("clearAllBtn");
 
 let stocks = JSON.parse(localStorage.getItem("stocks")) || [];
@@ -18,6 +19,7 @@ exportBtn.addEventListener("click", exportCSV);
 importFile.addEventListener("change", importCSV);
 sortBuyDateBtn.addEventListener("click", sortByBuyDateDesc);
 sortCodeBtn.addEventListener("click", sortByCodeAndRender);
+sortProfitRateBtn.addEventListener("click", sortByProfitRateAsc);
 clearAllBtn.addEventListener("click", clearAllStocks);
 
 /* =========================
@@ -109,9 +111,45 @@ function sortStocksByBuyDateDesc() {
   });
 }
 
+
+function getProfitRate(stock) {
+  const buyPrice = Number(stock.buyPrice);
+  const currentPrice = Number(stock.currentPrice);
+
+  if (!buyPrice || isNaN(buyPrice) || isNaN(currentPrice)) {
+    return 999999;
+  }
+
+  return ((currentPrice - buyPrice) / buyPrice) * 100;
+}
+
+function sortStocksByProfitRateAsc() {
+  stocks.sort((a, b) => {
+    const rateA = getProfitRate(a);
+    const rateB = getProfitRate(b);
+
+    if (rateA !== rateB) {
+      return rateA - rateB;
+    }
+
+    return String(a.code || "").localeCompare(
+      String(b.code || ""),
+      "ja",
+      { numeric: true }
+    );
+  });
+}
+
+function sortByProfitRateAsc() {
+  currentSortMode = "profitRate";
+  renderStocks();
+}
+
 function applyCurrentSort() {
   if (currentSortMode === "buyDate") {
     sortStocksByBuyDateDesc();
+  } else if (currentSortMode === "profitRate") {
+    sortStocksByProfitRateAsc();
   } else {
     sortStocksByCode();
   }
