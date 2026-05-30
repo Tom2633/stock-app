@@ -1,118 +1,236 @@
-/* style.css */
-
 body {
+  font-family: sans-serif;
   margin: 0;
-  padding: 20px;
+  padding: 8px;
   background: #f5f5f5;
-  font-family: Arial, sans-serif;
 }
 
 .container {
   max-width: 1400px;
   margin: auto;
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-h1 {
-  text-align: center;
-}
-
-.form-area {
+.input-area {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 10px;
-  margin-bottom: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 input,
 textarea,
 button {
-  padding: 10px;
+  padding: 8px;
   font-size: 14px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
   box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 6px;
 }
 
 textarea {
-  min-height: 80px;
+  min-height: 56px;
   resize: vertical;
 }
 
 button {
-  background: #0078d7;
-  color: white;
-  border: none;
   cursor: pointer;
-  font-weight: bold;
-}
-
-button:hover {
-  opacity: 0.9;
-}
-
-.table-area {
-  overflow-x: auto;
+  background: #f3f3f3;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
+  background: white;
+  font-size: 13px;
 }
 
 th,
 td {
-  border-bottom: 1px solid #ddd;
-  padding: 10px;
+  border: 1px solid #ccc;
+  padding: 6px;
   text-align: center;
-  vertical-align: top;
-}
-
-th {
-  background: #f0f0f0;
 }
 
 .plus {
-  color: green;
-  font-weight: bold;
-}
-
-.minus {
   color: red;
   font-weight: bold;
 }
 
-.total-profit {
-  margin-top: 20px;
-  text-align: right;
-  font-size: 20px;
+.minus {
+  color: blue;
   font-weight: bold;
 }
 
-.tag {
-  background: #eee;
-  padding: 4px 8px;
-  border-radius: 6px;
-  display: inline-block;
+.total-profit {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 12px;
 }
 
-@media (max-width: 600px) {
+#mobileCards {
+  display: none;
+}
 
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+  font-size: 13px;
+}
+
+.card-top {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+  align-items: start;
+}
+
+.card-name {
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
+.card-code {
+  color: #666;
+  font-size: 12px;
+}
+
+.card-profit {
+  font-size: 16px;
+  font-weight: bold;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.card-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+  color: #333;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #eee;
+  font-size: 12px;
+}
+
+.card-section {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid #eee;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: #333;
+}
+
+.card-buttons {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.card-buttons button {
+  flex: 1;
+  padding: 6px;
+  font-size: 13px;
+}
+
+@media screen and (max-width: 768px) {
   body {
-    padding: 10px;
+    padding: 4px;
+  }
+
+  .input-area {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  textarea {
+    grid-column: span 2;
+  }
+
+  #addBtn,
+  #exportBtn,
+  #importFile {
+    grid-column: span 2;
   }
 
   table {
+    display: none;
+  }
+
+  #mobileCards {
+    display: block;
+  }
+
+  .total-profit {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+}
+
+
+/* =========================
+   スマホ超コンパクト表示 v6
+========================= */
+
+@media screen and (max-width: 768px) {
+  .card {
+    padding: 6px 8px;
+    margin-bottom: 4px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
     font-size: 12px;
   }
 
-  input,
-  textarea,
-  button {
-    font-size: 12px;
+  .card-top {
+    gap: 2px;
   }
 
+  .card-name {
+    font-size: 15px;
+    line-height: 1.05;
+  }
+
+  .card-code {
+    font-size: 11px;
+    line-height: 1.1;
+  }
+
+  .card-profit {
+    font-size: 15px;
+    line-height: 1.05;
+  }
+
+  .card-line {
+    margin-top: 2px;
+    gap: 6px;
+    line-height: 1.1;
+  }
+
+  .badge {
+    padding: 1px 4px;
+    font-size: 10px;
+  }
+
+  .card-section {
+    display: none;
+  }
+
+  .card-buttons {
+    margin-top: 4px;
+    gap: 4px;
+  }
+
+  .card-buttons button {
+    padding: 4px;
+    font-size: 12px;
+  }
 }

@@ -1,147 +1,211 @@
-// script.js
+const stockTable = document.getElementById("stockTable");
+const totalProfit = document.getElementById("totalProfit");
+const addBtn = document.getElementById("addBtn");
+const exportBtn = document.getElementById("exportBtn");
+const importFile = document.getElementById("importFile");
+const clearAllBtn = document.getElementById("clearAllBtn");
 
-const stockTable =
-  document.getElementById("stockTable");
-
-const totalProfit =
-  document.getElementById("totalProfit");
-
-const addBtn =
-  document.getElementById("addBtn");
-
-let stocks =
-  JSON.parse(localStorage.getItem("stocks")) || [];
+let stocks = JSON.parse(localStorage.getItem("stocks")) || [];
+let editingIndex = null;
 
 renderStocks();
 
 addBtn.addEventListener("click", addStock);
+exportBtn.addEventListener("click", exportCSV);
+importFile.addEventListener("change", importCSV);
+clearAllBtn.addEventListener("click", clearAllStocks);
+
+/* =========================
+   共通
+========================= */
+
+function saveStocks() {
+  localStorage.setItem("stocks", JSON.stringify(stocks));
+}
+
+function escapeHTML(str) {
+  if (str == null) return "";
+
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;")
+    .replace(/\n/g, "<br>");
+}
+
+function toNumber(value) {
+  if (value == null) return NaN;
+
+  return Number(
+    String(value)
+      .replace(/,/g, "")
+      .replace(/\+/g, "")
+      .trim()
+  );
+}
+
+function sortStocksByCode() {
+  stocks.sort((a, b) =>
+    String(a.code || "").localeCompare(
+      String(b.code || ""),
+      "ja",
+      { numeric: true }
+    )
+  );
+}
+
+/* =========================
+   追加
+========================= */
 
 function addStock() {
+  const stock = {
+    id:
+      editingIndex !== null && stocks[editingIndex]
+        ? stocks[editingIndex].id || makeId()
+        : makeId(),
+    code:
+      editingIndex !== null && stocks[editingIndex]
+        ? stocks[editingIndex].code || ""
+        : "",
+    date:
+      editingIndex !== null && stocks[editingIndex]
+        ? stocks[editingIndex].date || new Date().toLocaleDateString()
+        : new Date().toLocaleDateString(),
+    name: document.getElementById("name").value.trim(),
+    shares: Number(document.getElementById("shares").value),
+    buyPrice: Number(document.getElementById("buyPrice").value),
+    currentPrice: Number(document.getElementById("currentPrice").value),
+    accountType: document.getElementById("accountType").value,
+    tag: document.getElementById("tag").value,
+    memo: document.getElementById("memo").value,
+    sellRule: document.getElementById("sellRule").value,
+    diary: document.getElementById("diary").value
+  };
 
-  const name =
-    document.getElementById("name").value;
-
-  const shares =
-    Number(document.getElementById("shares").value);
-
-  const buyPrice =
-    Number(document.getElementById("buyPrice").value);
-
-  const currentPrice =
-    Number(document.getElementById("currentPrice").value);
-
-  const tag =
-    document.getElementById("tag").value;
-
-  const memo =
-    document.getElementById("memo").value;
-
-  const sellRule =
-    document.getElementById("sellRule").value;
-
-  const diary =
-    document.getElementById("diary").value;
-
-  if (!name || !shares || !buyPrice || !currentPrice) {
+  if (!stock.name || !stock.shares || !stock.buyPrice || !stock.currentPrice) {
     alert("必須項目を入力してください");
     return;
   }
 
-  const date =
-    new Date().toLocaleDateString();
+  if (editingIndex !== null) {
+    stocks[editingIndex] = stock;
+    editingIndex = null;
+    addBtn.textContent = "追加";
+  } else {
+    stocks.push(stock);
+  }
 
-  const stock = {
-    date,
-    name,
-    shares,
-    buyPrice,
-    currentPrice,
-    tag,
-    memo,
-    sellRule,
-    diary
-  };
-
-  stocks.push(stock);
-
+  sortStocksByCode();
   saveStocks();
-
   renderStocks();
-
   clearInputs();
 }
 
-function renderStocks() {
+function clearInputs() {
+  document.getElementById("name").value = "";
+  document.getElementById("shares").value = "";
+  document.getElementById("buyPrice").value = "";
+  document.getElementById("currentPrice").value = "";
+  document.getElementById("accountType").value = "";
+  document.getElementById("tag").value = "";
+  document.getElementById("memo").value = "";
+  document.getElementById("sellRule").value = "";
+  document.getElementById("diary").value = "";
+}
 
+function makeId() {
+  return Date.now().toString(36) + "_" + Math.random().toString(36).slice(2);
+}
+
+/* =========================
+   表示
+========================= */
+
+function renderStocks() {
   stockTable.innerHTML = "";
+
+  const mobileCards = document.getElementById("mobileCards");
+  mobileCards.innerHTML = "";
+
+  sortStocksByCode();
 
   let total = 0;
 
   stocks.forEach((stock, index) => {
+    const shares = Number(stock.shares);
+    const buyPrice = Number(stock.buyPrice);
+    const currentPrice = Number(stock.currentPrice);
 
-    const profit =
-      (stock.currentPrice - stock.buyPrice)
-      * stock.shares;
+    if (isNaN(shares) || isNaN(buyPrice) || isNaN(currentPrice)) {
+      return;
+    }
 
-    const profitRate =
-      (
-        (
-          (stock.currentPrice - stock.buyPrice)
-          / stock.buyPrice
-        ) * 100
-      ).toFixed(2);
+    const profit = (currentPrice - buyPrice) * shares;
+    const profitRate = buyPrice === 0
+      ? 0
+      : ((currentPrice - buyPrice) / buyPrice * 100);
 
     total += profit;
 
-    const tr =
-      document.createElement("tr");
+    const plusMinus = profit >= 0 ? "plus" : "minus";
+
+    const tr = document.createElement("tr");
 
     tr.innerHTML = `
-      <td>${stock.date}</td>
-
-      <td>${stock.name}</td>
-
-      <td>${stock.shares}</td>
-
-      <td>${stock.buyPrice.toLocaleString()} 円</td>
-
-      <td>${stock.currentPrice.toLocaleString()} 円</td>
-
-      <td class="${profit >= 0 ? "plus" : "minus"}">
-        ${profit.toLocaleString()} 円
-      </td>
-
-      <td class="${profit >= 0 ? "plus" : "minus"}">
-        ${profitRate} %
-      </td>
-
-      <td>
-        <span class="tag">
-          ${stock.tag || ""}
-        </span>
-      </td>
-
-      <td>${stock.memo || ""}</td>
-
-      <td>${stock.sellRule || ""}</td>
-
-      <td>${stock.diary || ""}</td>
-
-      <td>
-        <button onclick="editStock(${index})">
-          編集
-        </button>
-      </td>
-
-      <td>
-        <button onclick="deleteStock(${index})">
-          削除
-        </button>
-      </td>
+      <td>${escapeHTML(stock.code || "")}</td>
+      <td>${escapeHTML(stock.name || "")}</td>
+      <td>${escapeHTML(stock.accountType || "")}</td>
+      <td>${shares.toLocaleString()}</td>
+      <td>${buyPrice.toLocaleString()}</td>
+      <td>${currentPrice.toLocaleString()}</td>
+      <td class="${plusMinus}">${profit.toLocaleString()}円</td>
+      <td class="${plusMinus}">${profitRate.toFixed(2)}%</td>
+      <td>${escapeHTML(stock.tag || "")}</td>
+      <td><button onclick="editStock(${index})">編集</button></td>
+      <td><button onclick="deleteStock(${index})">削除</button></td>
     `;
 
     stockTable.appendChild(tr);
 
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+      <div class="card-top">
+        <div>
+          <div class="card-name">${escapeHTML(stock.name || "")}</div>
+          <div class="card-code">
+            ${escapeHTML(stock.code || "")}
+            ${stock.accountType ? `<span class="badge">${escapeHTML(stock.accountType)}</span>` : ""}
+            ${stock.tag ? `<span class="badge">${escapeHTML(stock.tag)}</span>` : ""}
+          </div>
+        </div>
+        <div class="card-profit ${plusMinus}">
+          ${profit.toLocaleString()}円<br>
+          <span style="font-size:12px;">${profitRate.toFixed(2)}%</span>
+        </div>
+      </div>
+
+      <div class="card-line">
+        <span>株:${shares.toLocaleString()}</span>
+        <span>取得:${buyPrice.toLocaleString()}</span>
+        <span>現在:${currentPrice.toLocaleString()}</span>
+      </div>
+
+      ${stock.memo ? `<div class="card-section">メモ: ${escapeHTML(stock.memo)}</div>` : ""}
+      ${stock.sellRule ? `<div class="card-section">売却: ${escapeHTML(stock.sellRule)}</div>` : ""}
+      ${stock.diary ? `<div class="card-section">日記: ${escapeHTML(stock.diary)}</div>` : ""}
+
+      <div class="card-buttons">
+        <button onclick="editStock(${index})">編集</button>
+        <button onclick="deleteStock(${index})">削除</button>
+      </div>
+    `;
+
+    mobileCards.appendChild(card);
   });
 
   totalProfit.innerHTML =
@@ -153,167 +217,389 @@ function renderStocks() {
       : "total-profit minus";
 }
 
+/* =========================
+   編集・削除
+========================= */
+
 function deleteStock(index) {
-
-  if (confirm("削除しますか？")) {
-
-    stocks.splice(index, 1);
-
-    saveStocks();
-
-    renderStocks();
-  }
-}
-
-function editStock(index) {
-
-  const stock = stocks[index];
-
-  document.getElementById("name").value =
-    stock.name;
-
-  document.getElementById("shares").value =
-    stock.shares;
-
-  document.getElementById("buyPrice").value =
-    stock.buyPrice;
-
-  document.getElementById("currentPrice").value =
-    stock.currentPrice;
-
-  document.getElementById("tag").value =
-    stock.tag || "";
-
-  document.getElementById("memo").value =
-    stock.memo || "";
-
-  document.getElementById("sellRule").value =
-    stock.sellRule || "";
-
-  document.getElementById("diary").value =
-    stock.diary || "";
-
   stocks.splice(index, 1);
-
   saveStocks();
-
   renderStocks();
 }
 
-function saveStocks() {
+function editStock(index) {
+  const stock = stocks[index];
 
-  localStorage.setItem(
-    "stocks",
-    JSON.stringify(stocks)
-  );
+  document.getElementById("name").value = stock.name || "";
+  document.getElementById("shares").value = stock.shares || "";
+  document.getElementById("buyPrice").value = stock.buyPrice || "";
+  document.getElementById("currentPrice").value = stock.currentPrice || "";
+  document.getElementById("accountType").value = stock.accountType || "";
+  document.getElementById("tag").value = stock.tag || "";
+  document.getElementById("memo").value = stock.memo || "";
+  document.getElementById("sellRule").value = stock.sellRule || "";
+  document.getElementById("diary").value = stock.diary || "";
+
+  editingIndex = index;
+  addBtn.textContent = "更新";
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 }
 
-function clearInputs() {
+/* =========================
+   CSV出力
+========================= */
 
-  document.getElementById("name").value = "";
+function escapeCSV(value) {
+  if (value == null) return "";
 
-  document.getElementById("shares").value = "";
+  value = String(value);
 
-  document.getElementById("buyPrice").value = "";
+  if (
+    value.includes(",") ||
+    value.includes('"') ||
+    value.includes("\n") ||
+    value.includes("\r")
+  ) {
+    value = '"' + value.replace(/"/g, '""') + '"';
+  }
 
-  document.getElementById("currentPrice").value = "";
-
-  document.getElementById("tag").value = "";
-
-  document.getElementById("memo").value = "";
-
-  document.getElementById("sellRule").value = "";
-
-  document.getElementById("diary").value = "";
+  return value;
 }
-
-document
-  .getElementById("exportBtn")
-  .addEventListener("click", exportCSV);
 
 function exportCSV() {
-
   let csv =
-    "日付,銘柄,株数,取得単価,現在株価,タグ,メモ,売却ルール,投資日記\n";
+    "ID,コード,日付,銘柄,口座区分,株数,取得単価,現在株価,タグ,メモ,売却ルール,投資日記\n";
+
+  sortStocksByCode();
 
   stocks.forEach(stock => {
+    const row = [
+      escapeCSV(stock.id || makeId()),
+      escapeCSV(stock.code),
+      escapeCSV(stock.date),
+      escapeCSV(stock.name),
+      escapeCSV(stock.accountType),
+      escapeCSV(stock.shares),
+      escapeCSV(stock.buyPrice),
+      escapeCSV(stock.currentPrice),
+      escapeCSV(stock.tag),
+      escapeCSV(stock.memo),
+      escapeCSV(stock.sellRule),
+      escapeCSV(stock.diary)
+    ];
 
-    csv +=
-`${stock.date},
-${stock.name},
-${stock.shares},
-${stock.buyPrice},
-${stock.currentPrice},
-${stock.tag},
-${stock.memo},
-${stock.sellRule},
-${stock.diary}\n`;
-
+    csv += row.join(",") + "\n";
   });
 
-  const blob =
-    new Blob([csv], { type: "text/csv" });
+  const bom = "\uFEFF";
+  const blob = new Blob(
+    [bom + csv],
+    { type: "text/csv;charset=utf-8;" }
+  );
 
-  const link =
-    document.createElement("a");
-
-  link.href =
-    URL.createObjectURL(blob);
-
-  link.download =
-    "stocks.csv";
-
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "stocks.csv";
   link.click();
 }
 
-document
-  .getElementById("importFile")
-  .addEventListener("change", importCSV);
+/* =========================
+   CSV読込
+========================= */
 
 function importCSV(event) {
+  const files = Array.from(event.target.files);
 
-  const file =
-    event.target.files[0];
+  if (!files.length) return;
 
-  if (!file) return;
+  const readers = files.map(file => readFileText(file));
 
-  const reader =
-    new FileReader();
+  Promise.all(readers).then(texts => {
+    const allLines = texts.map(text => text.split(/\r?\n/));
 
-  reader.onload = function(e) {
+    const isSBI = allLines.some(lines =>
+      lines.some(line => line.includes("銘柄（コード）"))
+    );
 
-    const lines =
-      e.target.result.split("\n");
+    const isApp = allLines.length === 1 &&
+      allLines[0][0]
+        ?.replace(/^\uFEFF/, "")
+        .includes("コード") &&
+      allLines[0][0]
+        ?.replace(/^\uFEFF/, "")
+        .includes("銘柄");
 
-    lines.shift();
+    if (isSBI) {
+      importSBICSV(allLines);
+      importFile.value = "";
+      return;
+    }
 
-    lines.forEach(line => {
+    if (isApp) {
+      importAppCSV(allLines[0]);
+      importFile.value = "";
+      return;
+    }
 
-      const cols =
-        line.split(",");
+    alert("未対応CSV形式");
+    importFile.value = "";
+  });
+}
 
-      if (cols.length < 9) return;
+function readFileText(file) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
 
-      stocks.push({
-        date: cols[0],
-        name: cols[1],
-        shares: Number(cols[2]),
-        buyPrice: Number(cols[3]),
-        currentPrice: Number(cols[4]),
-        tag: cols[5],
-        memo: cols[6],
-        sellRule: cols[7],
-        diary: cols[8]
+    reader.onload = e => resolve(e.target.result);
+
+    // SBI CSV優先
+    reader.readAsText(file, "Shift-JIS");
+  });
+}
+
+/* =========================
+   アプリCSV読込
+========================= */
+
+function importAppCSV(lines) {
+  const header = parseCSVLine(lines[0].replace(/^\uFEFF/, ""));
+  const importedStocks = [];
+
+  lines.slice(1).forEach(line => {
+    if (!line.trim()) return;
+
+    const cols = parseCSVLine(line);
+
+    // 新形式: ID,コード,日付,銘柄,口座区分,株数,取得単価,現在株価,タグ,メモ,売却ルール,投資日記
+    if (header.includes("口座区分")) {
+      const shares = toNumber(cols[5]);
+      const buyPrice = toNumber(cols[6]);
+      const currentPrice = toNumber(cols[7]);
+
+      if (isNaN(shares) || isNaN(buyPrice) || isNaN(currentPrice)) return;
+
+      importedStocks.push({
+        id: cols[0] || makeId(),
+        code: cols[1] || "",
+        date: cols[2] || new Date().toLocaleDateString(),
+        name: cols[3] || "",
+        accountType: cols[4] || "",
+        shares,
+        buyPrice,
+        currentPrice,
+        tag: cols[8] || "",
+        memo: cols[9] || "",
+        sellRule: cols[10] || "",
+        diary: cols[11] || ""
       });
 
+      return;
+    }
+
+    // 旧形式: コード,日付,銘柄,株数,取得単価,現在株価,タグ,メモ,売却ルール,投資日記
+    if (cols.length >= 10) {
+      const shares = toNumber(cols[3]);
+      const buyPrice = toNumber(cols[4]);
+      const currentPrice = toNumber(cols[5]);
+
+      if (isNaN(shares) || isNaN(buyPrice) || isNaN(currentPrice)) return;
+
+      importedStocks.push({
+        id: makeId(),
+        code: cols[0] || "",
+        date: cols[1] || new Date().toLocaleDateString(),
+        name: cols[2] || "",
+        accountType: "",
+        shares,
+        buyPrice,
+        currentPrice,
+        tag: cols[6] || "",
+        memo: cols[7] || "",
+        sellRule: cols[8] || "",
+        diary: cols[9] || ""
+      });
+    }
+  });
+
+  stocks = importedStocks;
+  sortStocksByCode();
+  saveStocks();
+  renderStocks();
+
+  alert(`${stocks.length}件読み込みました`);
+}
+
+/* =========================
+   SBI CSV読込
+   - 複数ファイル同時読込対応
+   - 同じコードでも上書きせず別行で保持
+   - 口座区分は cols[6] 商品分類から取得
+   - コード順ソート
+========================= */
+
+function importSBICSV(linesArray) {
+  const existingMemoMap = createExistingMemoMap();
+  const importedStocks = [];
+
+  linesArray.forEach(lines => {
+    let start = false;
+
+    lines.forEach(line => {
+      if (line.includes("銘柄（コード）")) {
+        start = true;
+        return;
+      }
+
+      if (!start) return;
+      if (!line.trim()) return;
+
+      const cols = parseCSVLine(line);
+
+      if (cols.length < 7) return;
+
+      const rawName = (cols[0] || "").trim();
+
+      if (!rawName) return;
+
+      const parts = rawName.split(/\s+/);
+
+      if (
+        parts.length < 2 ||
+        !/^[0-9A-Z]+$/.test(parts[0])
+      ) {
+        return;
+      }
+
+      const code = parts[0];
+      const name = parts.slice(1).join(" ");
+      const shares = toNumber(cols[1]);
+      const buyPrice = toNumber(cols[2]);
+      const currentPrice = toNumber(cols[3]);
+      const accountType = cols[6] || "";
+
+      if (
+        isNaN(shares) ||
+        isNaN(buyPrice) ||
+        isNaN(currentPrice)
+      ) {
+        return;
+      }
+
+      // 同じコードでも別行として保持する。
+      // メモ類は、同じ「コード＋株数＋取得単価＋口座区分」が既にあれば引き継ぐ。
+      const memoKey = makeMemoKey(code, shares, buyPrice, accountType);
+      const existing = existingMemoMap[memoKey] || {};
+
+      importedStocks.push({
+        id: makeId(),
+        code,
+        date:
+          existing.date ||
+          new Date().toLocaleDateString(),
+        name,
+        accountType,
+        shares,
+        buyPrice,
+        currentPrice,
+        tag: existing.tag || "",
+        memo: existing.memo || "",
+        sellRule: existing.sellRule || "",
+        diary: existing.diary || ""
+      });
     });
+  });
 
-    saveStocks();
+  // ここが重要：
+  // 以前は stocks = stocks.concat(importedStocks); で全置換していた。
+  // 今回は既存データに追記する。
+  stocks = stocks.concat(importedStocks);
 
-    renderStocks();
+  sortStocksByCode();
+  saveStocks();
+  renderStocks();
 
-    alert("CSV取込完了");
-  };
+  alert(`${importedStocks.length}件追加しました`);
+}
 
-  reader.readAsText(file);
+function makeMemoKey(code, shares, buyPrice, accountType) {
+  return `${code}_${shares}_${buyPrice}_${accountType || ""}`;
+}
+
+function createExistingMemoMap() {
+  const map = {};
+
+  stocks.forEach(stock => {
+    const key = makeMemoKey(
+      stock.code || "",
+      stock.shares,
+      stock.buyPrice,
+      stock.accountType || ""
+    );
+
+    map[key] = {
+      date: stock.date,
+      tag: stock.tag,
+      memo: stock.memo,
+      sellRule: stock.sellRule,
+      diary: stock.diary
+    };
+  });
+
+  return map;
+}
+
+/* =========================
+   CSV解析
+========================= */
+
+function parseCSVLine(line) {
+  const result = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+
+    if (char === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === "," && !inQuotes) {
+      result.push(current.trim());
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+
+  result.push(current.trim());
+
+  return result.map(value =>
+    value.replace(/^"|"$/g, "")
+  );
+}
+
+function clearAllStocks() {
+
+  if (
+    !confirm(
+      "登録済みの全銘柄を削除しますか？"
+    )
+  ) {
+    return;
+  }
+
+  stocks = [];
+
+  localStorage.removeItem("stocks");
+
+  renderStocks();
+
 }
