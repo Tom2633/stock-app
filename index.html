@@ -7,20 +7,18 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
   <div class="container">
-
     <div class="input-area">
       <input type="text" id="name" placeholder="銘柄名">
       <input type="number" id="shares" placeholder="株数">
       <input type="number" id="buyPrice" placeholder="取得単価">
       <input type="number" id="currentPrice" placeholder="現在株価">
-      <input type="text" id="accountType" placeholder="口座区分（NISA・特定など）">
+      <input type="text" id="accountType" placeholder="口座区分">
       <input type="text" id="buyDate" class="buy-date-input" placeholder="買付日">
       <input type="text" id="tag" placeholder="タグ">
       <textarea id="memo" placeholder="メモ"></textarea>
       <textarea id="sellRule" placeholder="売却ルール"></textarea>
-      <textarea id="diary" placeholder="投資日記"></textarea>
+      <textarea id="diary" placeholder="投資記録"></textarea>
 
       <button id="addBtn">追加</button>
       <button id="sortBuyDateBtn" class="action-btn">買付日順</button>
@@ -46,6 +44,9 @@
           <th>損益</th>
           <th>率</th>
           <th>タグ</th>
+          <th>メモ</th>
+          <th>売却ルール</th>
+          <th>投資記録</th>
           <th>編集</th>
           <th>削除</th>
         </tr>
@@ -54,9 +55,7 @@
     </table>
 
     <div id="mobileCards"></div>
-
   </div>
-
   <script src="script.js"></script>
 </body>
 </html>

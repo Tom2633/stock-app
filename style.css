@@ -6,7 +6,7 @@ body {
 }
 
 .container {
-  max-width: 1400px;
+  max-width: 1600px;
   margin: auto;
 }
 
@@ -17,9 +17,7 @@ body {
   margin-bottom: 12px;
 }
 
-input,
-textarea,
-button {
+input, textarea, button {
   padding: 8px;
   font-size: 14px;
   box-sizing: border-box;
@@ -41,13 +39,12 @@ table {
   width: 100%;
   border-collapse: collapse;
   background: white;
-  font-size: 13px;
+  font-size: 12px;
 }
 
-th,
-td {
+th, td {
   border: 1px solid #ccc;
-  padding: 6px;
+  padding: 5px;
   text-align: center;
 }
 
@@ -140,48 +137,6 @@ td {
   font-size: 12px;
 }
 
-@media screen and (max-width: 768px) {
-  body {
-    padding: 4px;
-  }
-
-  .input-area {
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-  }
-
-  textarea {
-    grid-column: span 2;
-  }
-
-  #addBtn,
-  #sortBuyDateBtn,
-  #sortCodeBtn,
-  #exportBtn,
-  #clearAllBtn,
-  #importFile {
-    grid-column: span 2;
-  }
-
-  table {
-    display: none;
-  }
-
-  #mobileCards {
-    display: block;
-  }
-
-  .total-profit {
-    font-size: 18px;
-    margin-bottom: 8px;
-  }
-}
-
-
-/* =========================
-   v9 スマホ操作欄コンパクト化
-========================= */
-
 .action-btn {
   font-size: 13px;
   padding: 7px 4px;
@@ -192,37 +147,201 @@ td {
   color: #b00020;
 }
 
-@media screen and (max-width: 768px) {
-  .buy-date-input {
-    display: none;
+@media screen and (min-width: 769px) {
+  table {
+    table-layout: fixed;
   }
 
-  #sortBuyDateBtn,
-  #sortCodeBtn,
-  #exportBtn,
-  #clearAllBtn {
-    grid-column: auto;
+  th:nth-child(1), td:nth-child(1) { width: 60px; }
+  th:nth-child(2), td:nth-child(2) { width: 120px; }
+  th:nth-child(3), td:nth-child(3) { width: 55px; }
+  th:nth-child(4), td:nth-child(4) { width: 80px; }
+  th:nth-child(5), td:nth-child(5) { width: 55px; }
+  th:nth-child(6), td:nth-child(6) { width: 65px; }
+  th:nth-child(7), td:nth-child(7) { width: 65px; }
+  th:nth-child(8), td:nth-child(8) { width: 80px; }
+  th:nth-child(9), td:nth-child(9) { width: 65px; }
+  th:nth-child(10), td:nth-child(10) { width: 70px; }
+
+  th:nth-child(11), td:nth-child(11),
+  th:nth-child(12), td:nth-child(12),
+  th:nth-child(13), td:nth-child(13) {
+    width: 170px;
   }
 
-  #importFile {
-    grid-column: span 2;
+  th:nth-child(14), td:nth-child(14),
+  th:nth-child(15), td:nth-child(15) {
+    width: 50px;
   }
 
-  #sortBuyDateBtn,
-  #sortCodeBtn,
-  #exportBtn {
-    width: 100%;
-  }
-
-  #clearAllBtn {
-    grid-column: span 2;
-    width: 100%;
-    padding: 6px;
+  .note-cell {
+    text-align: left;
+    vertical-align: top;
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.35;
     font-size: 12px;
+    max-height: 90px;
+    overflow-y: auto;
+    background: #fffdf5;
   }
+}
+
+@media screen and (max-width: 768px) {
+  body { padding: 4px; }
 
   .input-area {
     grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .buy-date-input { display: none; }
+
+  #name, #shares, #buyPrice, #currentPrice, #accountType, #tag {
+    grid-column: span 1;
+    min-width: 0;
+  }
+
+  #memo, #sellRule, #diary {
+    grid-column: span 3;
+  }
+
+  #addBtn {
+    grid-column: span 3;
+  }
+
+  #sortBuyDateBtn, #sortCodeBtn, #sortProfitRateBtn {
+    grid-column: span 1;
+    font-size: 11px;
+    padding: 6px 2px;
+  }
+
+  #importFile, #exportBtn, #clearAllBtn {
+    grid-column: span 1;
+    width: 100%;
+    min-width: 0;
+    font-size: 11px;
+    padding: 6px 2px;
+  }
+
+  #importFile { font-size: 10px; }
+
+  table { display: none; }
+  #mobileCards { display: block; }
+
+  .total-profit {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+}
+
+
+/* =========================
+   v13 PC編集欄を拡大
+========================= */
+
+@media screen and (min-width: 769px) {
+  #memo,
+  #sellRule,
+  #diary {
+    grid-column: span 2;
+    min-height: 120px;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  .input-area {
+    grid-template-columns: repeat(4, 1fr);
+    align-items: start;
+  }
+
+  #addBtn,
+  #sortBuyDateBtn,
+  #sortCodeBtn,
+  #sortProfitRateBtn,
+  #exportBtn,
+  #clearAllBtn {
+    min-height: 40px;
+  }
+
+  #importFile {
+    min-height: 40px;
+  }
+}
+
+
+/* =========================
+   v14 PC表示のみ 編集フォーム配置調整
+   - 通常入力欄は1行6枠
+   - メモ、売却ルール、投資記録は横3つ並び
+   - 各幅250px、高さ4行程度
+========================= */
+
+@media screen and (min-width: 769px) {
+  .input-area {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    align-items: start;
+  }
+
+  /* 通常入力欄は6枠で1行に並べる */
+  #name,
+  #shares,
+  #buyPrice,
+  #currentPrice,
+  #accountType,
+  #buyDate,
+  #tag {
+    grid-column: span 1 !important;
+    width: 100%;
+    min-height: 38px;
+  }
+
+  /* メモ系3枠は横並び、幅250px、高さ4行程度 */
+  #memo,
+  #sellRule,
+  #diary {
+    grid-column: span 2 !important;
+    width: 250px;
+    max-width: 100%;
+    min-height: 92px;
+    height: 92px;
+    font-size: 14px;
+    line-height: 1.35;
+    resize: vertical;
+  }
+
+  /* ボタン類も通常サイズ */
+  #addBtn,
+  #sortBuyDateBtn,
+  #sortCodeBtn,
+  #sortProfitRateBtn,
+  #exportBtn,
+  #clearAllBtn,
+  #importFile {
+    grid-column: span 1 !important;
+    min-height: 38px;
+  }
+}
+
+
+/* =========================
+   v15 PCフォーム配置調整
+   添付画像イメージ:
+   1段目: 小さい入力枠を横6個
+   2段目: メモ・売却ルール・投資記録を横3個
+   スマホ表示は従来どおり
+========================= */
+
+@media screen and (min-width: 769px) {
+  .input-area {
+    display: grid;
+    grid-template-columns: repeat(6, 140px);
+    grid-auto-rows: auto;
+    gap: 8px;
+    align-items: start;
+    justify-content: start;
   }
 
   #name,
@@ -231,47 +350,321 @@ td {
   #currentPrice,
   #accountType,
   #tag {
-    grid-column: span 1;
-    min-width: 0;
+    grid-column: span 1 !important;
+    width: 140px;
+    height: 34px;
+  }
+
+  /* PCでは買付日は上段に出さず非表示 */
+  #buyDate {
+    display: none;
   }
 
   #memo,
   #sellRule,
   #diary {
-    grid-column: span 3;
+    grid-column: span 2 !important;
+    width: 280px;
+    height: 92px;
+    min-height: 92px;
+    max-height: 92px;
+    resize: vertical;
+    line-height: 1.35;
   }
 
   #addBtn,
+  #sortBuyDateBtn,
+  #sortCodeBtn,
+  #sortProfitRateBtn,
+  #exportBtn,
+  #clearAllBtn,
   #importFile {
-    grid-column: span 3;
+    grid-column: span 1 !important;
+    width: 140px;
+    height: 34px;
+    padding: 6px;
+    font-size: 13px;
+  }
+
+  #importFile {
+    padding: 5px;
   }
 }
 
 
 /* =========================
-   v11 損益率ソート・スマホボタン配置
+   v16 PC表示 編集フォームを画面幅いっぱいに最適化
+   - 1段目: 銘柄名を広く、数値系をコンパクトに横並び
+   - 2段目: メモ・売却ルール・投資記録を3列で広く
+   - 3段目: 操作ボタンを横並び
+   - スマホ表示は従来どおり
 ========================= */
 
-@media screen and (max-width: 768px) {
-  #sortBuyDateBtn,
-  #sortCodeBtn,
-  #sortProfitRateBtn {
-    grid-column: span 1;
-    font-size: 11px;
-    padding: 6px 2px;
+@media screen and (min-width: 769px) {
+  .container {
+    max-width: none;
+    width: calc(100% - 24px);
+    margin: 0 auto;
   }
 
-  #importFile,
+  .input-area {
+    display: grid;
+    grid-template-columns:
+      2.2fr 0.8fr 0.9fr 0.9fr 0.9fr 1fr;
+    gap: 8px;
+    width: 100%;
+    align-items: start;
+  }
+
+  /* 1段目 */
+  #name {
+    grid-column: 1 / 2 !important;
+    width: 100%;
+    height: 36px;
+  }
+
+  #shares {
+    grid-column: 2 / 3 !important;
+    width: 100%;
+    height: 36px;
+  }
+
+  #buyPrice {
+    grid-column: 3 / 4 !important;
+    width: 100%;
+    height: 36px;
+  }
+
+  #currentPrice {
+    grid-column: 4 / 5 !important;
+    width: 100%;
+    height: 36px;
+  }
+
+  #accountType {
+    grid-column: 5 / 6 !important;
+    width: 100%;
+    height: 36px;
+  }
+
+  #tag {
+    grid-column: 6 / 7 !important;
+    width: 100%;
+    height: 36px;
+  }
+
+  /* 買付日はCSVから取るためPC編集欄では非表示 */
+  #buyDate {
+    display: none;
+  }
+
+  /* 2段目：メモ3列 */
+  #memo {
+    grid-column: 1 / 3 !important;
+    width: 100%;
+    height: 112px;
+    min-height: 112px;
+  }
+
+  #sellRule {
+    grid-column: 3 / 5 !important;
+    width: 100%;
+    height: 112px;
+    min-height: 112px;
+  }
+
+  #diary {
+    grid-column: 5 / 7 !important;
+    width: 100%;
+    height: 112px;
+    min-height: 112px;
+  }
+
+  #memo,
+  #sellRule,
+  #diary {
+    font-size: 14px;
+    line-height: 1.4;
+    resize: vertical;
+  }
+
+  /* 3段目：操作ボタン */
+  #addBtn,
+  #sortBuyDateBtn,
+  #sortCodeBtn,
+  #sortProfitRateBtn,
   #exportBtn,
   #clearAllBtn {
-    grid-column: span 1;
+    grid-column: span 1 !important;
     width: 100%;
-    min-width: 0;
-    font-size: 11px;
-    padding: 6px 2px;
+    height: 36px;
+    padding: 6px;
+    font-size: 13px;
   }
 
   #importFile {
-    font-size: 10px;
+    grid-column: span 2 !important;
+    width: 100%;
+    height: 36px;
+    padding: 5px;
+    font-size: 13px;
+  }
+}
+
+
+/* =========================
+   v17 PC業務アプリ風レイアウト
+   上段:
+     左側 = 入力フォーム 6枠
+     右側 = ボタン群
+   下段:
+     メモ・売却ルール・投資記録 3列
+   スマホ表示は従来どおり
+========================= */
+
+@media screen and (min-width: 769px) {
+  .container {
+    max-width: none;
+    width: calc(100% - 24px);
+    margin: 0 auto;
+  }
+
+  .input-area {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(90px, 1fr)) 140px 140px;
+    grid-template-rows: auto auto auto;
+    gap: 8px;
+    width: 100%;
+    align-items: stretch;
+  }
+
+  /* 上段左：入力フォーム6枠 */
+  #name {
+    grid-column: 1 / 2 !important;
+    grid-row: 1 !important;
+    width: 100%;
+    height: 36px;
+  }
+
+  #shares {
+    grid-column: 2 / 3 !important;
+    grid-row: 1 !important;
+    width: 100%;
+    height: 36px;
+  }
+
+  #buyPrice {
+    grid-column: 3 / 4 !important;
+    grid-row: 1 !important;
+    width: 100%;
+    height: 36px;
+  }
+
+  #currentPrice {
+    grid-column: 4 / 5 !important;
+    grid-row: 1 !important;
+    width: 100%;
+    height: 36px;
+  }
+
+  #accountType {
+    grid-column: 5 / 6 !important;
+    grid-row: 1 !important;
+    width: 100%;
+    height: 36px;
+  }
+
+  #tag {
+    grid-column: 6 / 7 !important;
+    grid-row: 1 !important;
+    width: 100%;
+    height: 36px;
+  }
+
+  /* 買付日はCSV由来なのでPC入力欄では非表示 */
+  #buyDate {
+    display: none;
+  }
+
+  /* 上段右：ボタン群 */
+  #addBtn {
+    grid-column: 7 / 8 !important;
+    grid-row: 1 !important;
+  }
+
+  #sortBuyDateBtn {
+    grid-column: 8 / 9 !important;
+    grid-row: 1 !important;
+  }
+
+  #sortCodeBtn {
+    grid-column: 7 / 8 !important;
+    grid-row: 2 !important;
+  }
+
+  #sortProfitRateBtn {
+    grid-column: 8 / 9 !important;
+    grid-row: 2 !important;
+  }
+
+  #importFile {
+    grid-column: 7 / 9 !important;
+    grid-row: 3 !important;
+  }
+
+  #exportBtn {
+    grid-column: 7 / 8 !important;
+    grid-row: 4 !important;
+  }
+
+  #clearAllBtn {
+    grid-column: 8 / 9 !important;
+    grid-row: 4 !important;
+  }
+
+  #addBtn,
+  #sortBuyDateBtn,
+  #sortCodeBtn,
+  #sortProfitRateBtn,
+  #exportBtn,
+  #clearAllBtn,
+  #importFile {
+    width: 100%;
+    height: 36px;
+    min-height: 36px;
+    padding: 6px;
+    font-size: 13px;
+  }
+
+  #importFile {
+    padding: 5px;
+  }
+
+  /* 下段：メモ3列。左入力フォーム6列分だけを使う */
+  #memo {
+    grid-column: 1 / 3 !important;
+    grid-row: 2 / 5 !important;
+  }
+
+  #sellRule {
+    grid-column: 3 / 5 !important;
+    grid-row: 2 / 5 !important;
+  }
+
+  #diary {
+    grid-column: 5 / 7 !important;
+    grid-row: 2 / 5 !important;
+  }
+
+  #memo,
+  #sellRule,
+  #diary {
+    width: 100%;
+    height: 118px;
+    min-height: 118px;
+    max-height: 118px;
+    resize: vertical;
+    font-size: 14px;
+    line-height: 1.4;
   }
 }
