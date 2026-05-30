@@ -176,3 +176,73 @@ td {
     margin-bottom: 8px;
   }
 }
+
+
+/* =========================
+   v9 スマホ操作欄コンパクト化
+========================= */
+
+.action-btn {
+  font-size: 13px;
+  padding: 7px 4px;
+  white-space: nowrap;
+}
+
+.danger-btn {
+  color: #b00020;
+}
+
+@media screen and (max-width: 768px) {
+  .buy-date-input {
+    display: none;
+  }
+
+  #sortBuyDateBtn,
+  #sortCodeBtn,
+  #exportBtn,
+  #clearAllBtn {
+    grid-column: auto;
+  }
+
+  #importFile {
+    grid-column: span 2;
+  }
+
+  #sortBuyDateBtn,
+  #sortCodeBtn,
+  #exportBtn {
+    width: 100%;
+  }
+
+  #clearAllBtn {
+    grid-column: span 2;
+    width: 100%;
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  .input-area {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  #name,
+  #shares,
+  #buyPrice,
+  #currentPrice,
+  #accountType,
+  #tag {
+    grid-column: span 1;
+    min-width: 0;
+  }
+
+  #memo,
+  #sellRule,
+  #diary {
+    grid-column: span 3;
+  }
+
+  #addBtn,
+  #importFile {
+    grid-column: span 3;
+  }
+}

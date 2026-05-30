@@ -388,7 +388,19 @@ function exportCSV() {
 
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = "stocks.csv";
+  const now = new Date();
+
+  const filename =
+    "stock" +
+    String(now.getFullYear()).slice(-2) +
+    String(now.getMonth() + 1).padStart(2, "0") +
+    String(now.getDate()).padStart(2, "0") +
+    "_" +
+    String(now.getHours()).padStart(2, "0") +
+    String(now.getMinutes()).padStart(2, "0") +
+    String(now.getSeconds()).padStart(2, "0");
+
+  link.download = `${filename}.csv`;
   link.click();
 }
 
