@@ -73,73 +73,71 @@ td {
 
 .card {
   background: white;
-  border-radius: 10px;
-  padding: 8px 10px;
-  margin-bottom: 8px;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
-  font-size: 13px;
+  border-radius: 6px;
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  font-size: 12px;
 }
 
 .card-top {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 6px;
+  gap: 2px;
   align-items: start;
 }
 
 .card-name {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: bold;
-  line-height: 1.2;
+  line-height: 1.05;
 }
 
 .card-code {
   color: #666;
-  font-size: 12px;
+  font-size: 11px;
+  line-height: 1.1;
 }
 
 .card-profit {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: bold;
   text-align: right;
   white-space: nowrap;
+  line-height: 1.05;
 }
 
 .card-line {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 6px;
+  gap: 6px;
+  margin-top: 2px;
   color: #333;
+  line-height: 1.1;
 }
 
 .badge {
   display: inline-block;
-  padding: 2px 6px;
+  padding: 1px 4px;
   border-radius: 999px;
   background: #eee;
-  font-size: 12px;
+  font-size: 10px;
 }
 
 .card-section {
-  margin-top: 6px;
-  padding-top: 6px;
-  border-top: 1px solid #eee;
-  white-space: pre-wrap;
-  word-break: break-word;
-  color: #333;
+  display: none;
 }
 
 .card-buttons {
   display: flex;
-  gap: 6px;
-  margin-top: 8px;
+  gap: 4px;
+  margin-top: 4px;
 }
 
 .card-buttons button {
   flex: 1;
-  padding: 6px;
-  font-size: 13px;
+  padding: 4px;
+  font-size: 12px;
 }
 
 @media screen and (max-width: 768px) {
@@ -157,7 +155,10 @@ td {
   }
 
   #addBtn,
+  #sortBuyDateBtn,
+  #sortCodeBtn,
   #exportBtn,
+  #clearAllBtn,
   #importFile {
     grid-column: span 2;
   }
@@ -173,64 +174,5 @@ td {
   .total-profit {
     font-size: 18px;
     margin-bottom: 8px;
-  }
-}
-
-
-/* =========================
-   スマホ超コンパクト表示 v6
-========================= */
-
-@media screen and (max-width: 768px) {
-  .card {
-    padding: 6px 8px;
-    margin-bottom: 4px;
-    border-radius: 6px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-    font-size: 12px;
-  }
-
-  .card-top {
-    gap: 2px;
-  }
-
-  .card-name {
-    font-size: 15px;
-    line-height: 1.05;
-  }
-
-  .card-code {
-    font-size: 11px;
-    line-height: 1.1;
-  }
-
-  .card-profit {
-    font-size: 15px;
-    line-height: 1.05;
-  }
-
-  .card-line {
-    margin-top: 2px;
-    gap: 6px;
-    line-height: 1.1;
-  }
-
-  .badge {
-    padding: 1px 4px;
-    font-size: 10px;
-  }
-
-  .card-section {
-    display: none;
-  }
-
-  .card-buttons {
-    margin-top: 4px;
-    gap: 4px;
-  }
-
-  .card-buttons button {
-    padding: 4px;
-    font-size: 12px;
   }
 }

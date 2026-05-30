@@ -3,16 +3,21 @@ const totalProfit = document.getElementById("totalProfit");
 const addBtn = document.getElementById("addBtn");
 const exportBtn = document.getElementById("exportBtn");
 const importFile = document.getElementById("importFile");
+const sortBuyDateBtn = document.getElementById("sortBuyDateBtn");
+const sortCodeBtn = document.getElementById("sortCodeBtn");
 const clearAllBtn = document.getElementById("clearAllBtn");
 
 let stocks = JSON.parse(localStorage.getItem("stocks")) || [];
 let editingIndex = null;
+let currentSortMode = "code";
 
 renderStocks();
 
 addBtn.addEventListener("click", addStock);
 exportBtn.addEventListener("click", exportCSV);
 importFile.addEventListener("change", importCSV);
+sortBuyDateBtn.addEventListener("click", sortByBuyDateDesc);
+sortCodeBtn.addEventListener("click", sortByCodeAndRender);
 clearAllBtn.addEventListener("click", clearAllStocks);
 
 /* =========================
@@ -46,6 +51,37 @@ function toNumber(value) {
   );
 }
 
+function makeId() {
+  return Date.now().toString(36) + "_" + Math.random().toString(36).slice(2);
+}
+
+function parseBuyDateForSort(value) {
+  if (!value || value === "----/--/--") {
+    return 0;
+  }
+
+  const normalized = String(value)
+    .replace(/\./g, "/")
+    .replace(/-/g, "/")
+    .trim();
+
+  const parts = normalized.split("/");
+
+  if (parts.length < 3) {
+    return 0;
+  }
+
+  const y = Number(parts[0]);
+  const m = Number(parts[1]);
+  const d = Number(parts[2]);
+
+  if (isNaN(y) || isNaN(m) || isNaN(d)) {
+    return 0;
+  }
+
+  return y * 10000 + m * 100 + d;
+}
+
 function sortStocksByCode() {
   stocks.sort((a, b) =>
     String(a.code || "").localeCompare(
@@ -56,8 +92,43 @@ function sortStocksByCode() {
   );
 }
 
+function sortStocksByBuyDateDesc() {
+  stocks.sort((a, b) => {
+    const da = parseBuyDateForSort(a.buyDate);
+    const db = parseBuyDateForSort(b.buyDate);
+
+    if (db !== da) {
+      return db - da;
+    }
+
+    return String(a.code || "").localeCompare(
+      String(b.code || ""),
+      "ja",
+      { numeric: true }
+    );
+  });
+}
+
+function applyCurrentSort() {
+  if (currentSortMode === "buyDate") {
+    sortStocksByBuyDateDesc();
+  } else {
+    sortStocksByCode();
+  }
+}
+
+function sortByBuyDateDesc() {
+  currentSortMode = "buyDate";
+  renderStocks();
+}
+
+function sortByCodeAndRender() {
+  currentSortMode = "code";
+  renderStocks();
+}
+
 /* =========================
-   追加
+   追加・更新
 ========================= */
 
 function addStock() {
@@ -79,6 +150,7 @@ function addStock() {
     buyPrice: Number(document.getElementById("buyPrice").value),
     currentPrice: Number(document.getElementById("currentPrice").value),
     accountType: document.getElementById("accountType").value,
+    buyDate: document.getElementById("buyDate").value,
     tag: document.getElementById("tag").value,
     memo: document.getElementById("memo").value,
     sellRule: document.getElementById("sellRule").value,
@@ -98,7 +170,7 @@ function addStock() {
     stocks.push(stock);
   }
 
-  sortStocksByCode();
+  applyCurrentSort();
   saveStocks();
   renderStocks();
   clearInputs();
@@ -110,14 +182,11 @@ function clearInputs() {
   document.getElementById("buyPrice").value = "";
   document.getElementById("currentPrice").value = "";
   document.getElementById("accountType").value = "";
+  document.getElementById("buyDate").value = "";
   document.getElementById("tag").value = "";
   document.getElementById("memo").value = "";
   document.getElementById("sellRule").value = "";
   document.getElementById("diary").value = "";
-}
-
-function makeId() {
-  return Date.now().toString(36) + "_" + Math.random().toString(36).slice(2);
 }
 
 /* =========================
@@ -130,7 +199,7 @@ function renderStocks() {
   const mobileCards = document.getElementById("mobileCards");
   mobileCards.innerHTML = "";
 
-  sortStocksByCode();
+  applyCurrentSort();
 
   let total = 0;
 
@@ -158,6 +227,7 @@ function renderStocks() {
       <td>${escapeHTML(stock.code || "")}</td>
       <td>${escapeHTML(stock.name || "")}</td>
       <td>${escapeHTML(stock.accountType || "")}</td>
+      <td>${escapeHTML(stock.buyDate || "")}</td>
       <td>${shares.toLocaleString()}</td>
       <td>${buyPrice.toLocaleString()}</td>
       <td>${currentPrice.toLocaleString()}</td>
@@ -180,6 +250,7 @@ function renderStocks() {
           <div class="card-code">
             ${escapeHTML(stock.code || "")}
             ${stock.accountType ? `<span class="badge">${escapeHTML(stock.accountType)}</span>` : ""}
+            ${stock.buyDate ? `<span class="badge">${escapeHTML(stock.buyDate)}</span>` : ""}
             ${stock.tag ? `<span class="badge">${escapeHTML(stock.tag)}</span>` : ""}
           </div>
         </div>
@@ -235,6 +306,7 @@ function editStock(index) {
   document.getElementById("buyPrice").value = stock.buyPrice || "";
   document.getElementById("currentPrice").value = stock.currentPrice || "";
   document.getElementById("accountType").value = stock.accountType || "";
+  document.getElementById("buyDate").value = stock.buyDate || "";
   document.getElementById("tag").value = stock.tag || "";
   document.getElementById("memo").value = stock.memo || "";
   document.getElementById("sellRule").value = stock.sellRule || "";
@@ -247,6 +319,18 @@ function editStock(index) {
     top: 0,
     behavior: "smooth"
   });
+}
+
+function clearAllStocks() {
+  if (!confirm("登録済みの全銘柄を削除しますか？")) {
+    return;
+  }
+
+  stocks = [];
+  localStorage.removeItem("stocks");
+  editingIndex = null;
+  addBtn.textContent = "追加";
+  renderStocks();
 }
 
 /* =========================
@@ -272,9 +356,9 @@ function escapeCSV(value) {
 
 function exportCSV() {
   let csv =
-    "ID,コード,日付,銘柄,口座区分,株数,取得単価,現在株価,タグ,メモ,売却ルール,投資日記\n";
+    "ID,コード,日付,銘柄,口座区分,買付日,株数,取得単価,現在株価,タグ,メモ,売却ルール,投資日記\n";
 
-  sortStocksByCode();
+  applyCurrentSort();
 
   stocks.forEach(stock => {
     const row = [
@@ -283,6 +367,7 @@ function exportCSV() {
       escapeCSV(stock.date),
       escapeCSV(stock.name),
       escapeCSV(stock.accountType),
+      escapeCSV(stock.buyDate),
       escapeCSV(stock.shares),
       escapeCSV(stock.buyPrice),
       escapeCSV(stock.currentPrice),
@@ -356,7 +441,6 @@ function readFileText(file) {
 
     reader.onload = e => resolve(e.target.result);
 
-    // SBI CSV優先
     reader.readAsText(file, "Shift-JIS");
   });
 }
@@ -374,7 +458,36 @@ function importAppCSV(lines) {
 
     const cols = parseCSVLine(line);
 
-    // 新形式: ID,コード,日付,銘柄,口座区分,株数,取得単価,現在株価,タグ,メモ,売却ルール,投資日記
+    // 新形式:
+    // ID,コード,日付,銘柄,口座区分,買付日,株数,取得単価,現在株価,タグ,メモ,売却ルール,投資日記
+    if (header.includes("口座区分") && header.includes("買付日")) {
+      const shares = toNumber(cols[6]);
+      const buyPrice = toNumber(cols[7]);
+      const currentPrice = toNumber(cols[8]);
+
+      if (isNaN(shares) || isNaN(buyPrice) || isNaN(currentPrice)) return;
+
+      importedStocks.push({
+        id: cols[0] || makeId(),
+        code: cols[1] || "",
+        date: cols[2] || new Date().toLocaleDateString(),
+        name: cols[3] || "",
+        accountType: cols[4] || "",
+        buyDate: cols[5] || "",
+        shares,
+        buyPrice,
+        currentPrice,
+        tag: cols[9] || "",
+        memo: cols[10] || "",
+        sellRule: cols[11] || "",
+        diary: cols[12] || ""
+      });
+
+      return;
+    }
+
+    // 旧v4形式:
+    // ID,コード,日付,銘柄,口座区分,株数,取得単価,現在株価,タグ,メモ,売却ルール,投資日記
     if (header.includes("口座区分")) {
       const shares = toNumber(cols[5]);
       const buyPrice = toNumber(cols[6]);
@@ -388,6 +501,7 @@ function importAppCSV(lines) {
         date: cols[2] || new Date().toLocaleDateString(),
         name: cols[3] || "",
         accountType: cols[4] || "",
+        buyDate: "",
         shares,
         buyPrice,
         currentPrice,
@@ -400,7 +514,8 @@ function importAppCSV(lines) {
       return;
     }
 
-    // 旧形式: コード,日付,銘柄,株数,取得単価,現在株価,タグ,メモ,売却ルール,投資日記
+    // 旧形式:
+    // コード,日付,銘柄,株数,取得単価,現在株価,タグ,メモ,売却ルール,投資日記
     if (cols.length >= 10) {
       const shares = toNumber(cols[3]);
       const buyPrice = toNumber(cols[4]);
@@ -414,6 +529,7 @@ function importAppCSV(lines) {
         date: cols[1] || new Date().toLocaleDateString(),
         name: cols[2] || "",
         accountType: "",
+        buyDate: "",
         shares,
         buyPrice,
         currentPrice,
@@ -426,6 +542,7 @@ function importAppCSV(lines) {
   });
 
   stocks = importedStocks;
+  currentSortMode = "code";
   sortStocksByCode();
   saveStocks();
   renderStocks();
@@ -436,9 +553,10 @@ function importAppCSV(lines) {
 /* =========================
    SBI CSV読込
    - 複数ファイル同時読込対応
+   - 後から読み込んでも追記
    - 同じコードでも上書きせず別行で保持
    - 口座区分は cols[6] 商品分類から取得
-   - コード順ソート
+   - 買付日は cols[7] から取得
 ========================= */
 
 function importSBICSV(linesArray) {
@@ -459,7 +577,7 @@ function importSBICSV(linesArray) {
 
       const cols = parseCSVLine(line);
 
-      if (cols.length < 7) return;
+      if (cols.length < 8) return;
 
       const rawName = (cols[0] || "").trim();
 
@@ -480,6 +598,7 @@ function importSBICSV(linesArray) {
       const buyPrice = toNumber(cols[2]);
       const currentPrice = toNumber(cols[3]);
       const accountType = cols[6] || "";
+      const buyDate = cols[7] || "";
 
       if (
         isNaN(shares) ||
@@ -489,9 +608,7 @@ function importSBICSV(linesArray) {
         return;
       }
 
-      // 同じコードでも別行として保持する。
-      // メモ類は、同じ「コード＋株数＋取得単価＋口座区分」が既にあれば引き継ぐ。
-      const memoKey = makeMemoKey(code, shares, buyPrice, accountType);
+      const memoKey = makeMemoKey(code, shares, buyPrice, accountType, buyDate);
       const existing = existingMemoMap[memoKey] || {};
 
       importedStocks.push({
@@ -502,6 +619,7 @@ function importSBICSV(linesArray) {
           new Date().toLocaleDateString(),
         name,
         accountType,
+        buyDate,
         shares,
         buyPrice,
         currentPrice,
@@ -513,20 +631,16 @@ function importSBICSV(linesArray) {
     });
   });
 
-  // ここが重要：
-  // 以前は stocks = stocks.concat(importedStocks); で全置換していた。
-  // 今回は既存データに追記する。
   stocks = stocks.concat(importedStocks);
-
-  sortStocksByCode();
+  applyCurrentSort();
   saveStocks();
   renderStocks();
 
   alert(`${importedStocks.length}件追加しました`);
 }
 
-function makeMemoKey(code, shares, buyPrice, accountType) {
-  return `${code}_${shares}_${buyPrice}_${accountType || ""}`;
+function makeMemoKey(code, shares, buyPrice, accountType, buyDate) {
+  return `${code}_${shares}_${buyPrice}_${accountType || ""}_${buyDate || ""}`;
 }
 
 function createExistingMemoMap() {
@@ -537,7 +651,8 @@ function createExistingMemoMap() {
       stock.code || "",
       stock.shares,
       stock.buyPrice,
-      stock.accountType || ""
+      stock.accountType || "",
+      stock.buyDate || ""
     );
 
     map[key] = {
@@ -584,22 +699,4 @@ function parseCSVLine(line) {
   return result.map(value =>
     value.replace(/^"|"$/g, "")
   );
-}
-
-function clearAllStocks() {
-
-  if (
-    !confirm(
-      "登録済みの全銘柄を削除しますか？"
-    )
-  ) {
-    return;
-  }
-
-  stocks = [];
-
-  localStorage.removeItem("stocks");
-
-  renderStocks();
-
 }

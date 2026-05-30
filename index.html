@@ -16,12 +16,15 @@
       <input type="number" id="buyPrice" placeholder="取得単価">
       <input type="number" id="currentPrice" placeholder="現在株価">
       <input type="text" id="accountType" placeholder="口座区分（NISA・特定など）">
+      <input type="text" id="buyDate" placeholder="買付日">
       <input type="text" id="tag" placeholder="タグ">
       <textarea id="memo" placeholder="メモ"></textarea>
       <textarea id="sellRule" placeholder="売却ルール"></textarea>
       <textarea id="diary" placeholder="投資日記"></textarea>
 
       <button id="addBtn">追加</button>
+      <button id="sortBuyDateBtn">買付日が新しい順</button>
+      <button id="sortCodeBtn">コード順</button>
       <input type="file" id="importFile" accept=".csv" multiple>
       <button id="exportBtn">CSV出力</button>
       <button id="clearAllBtn">全データ削除</button>
@@ -35,6 +38,7 @@
           <th>コード</th>
           <th>銘柄</th>
           <th>口座</th>
+          <th>買付日</th>
           <th>株数</th>
           <th>取得</th>
           <th>現在</th>
