@@ -24,6 +24,15 @@ sortProfitRateBtn.addEventListener("click", sortByProfitRateAsc);
 clearAllBtn.addEventListener("click", clearAllStocks);
 toggleFormBtn.addEventListener("click", toggleForm);
 
+
+function makeYutaiUrl(code) {
+  return `https://96ut.com/stock/yutai.php?code=${encodeURIComponent(code || "")}`;
+}
+
+function makeYahooFinanceUrl(code) {
+  return `https://finance.yahoo.co.jp/quote/${encodeURIComponent(code || "")}.T`;
+}
+
 function saveStocks() {
   localStorage.setItem("stocks", JSON.stringify(stocks));
 }
@@ -207,8 +216,16 @@ function renderStocks() {
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${escapeHTML(stock.code || "")}</td>
-      <td>${escapeHTML(stock.name || "")}</td>
+      <td>
+        <a href="${makeYahooFinanceUrl(stock.code)}" target="_blank" rel="noopener noreferrer">
+          ${escapeHTML(stock.code || "")}
+        </a>
+      </td>
+      <td>
+        <a href="${makeYutaiUrl(stock.code)}" target="_blank" rel="noopener noreferrer">
+          ${escapeHTML(stock.name || "")}
+        </a>
+      </td>
       <td>${escapeHTML(stock.accountType || "")}</td>
       <td>${escapeHTML(stock.buyDate || "")}</td>
       <td>${shares.toLocaleString()}</td>
@@ -230,9 +247,15 @@ function renderStocks() {
     card.innerHTML = `
       <div class="card-top">
         <div>
-          <div class="card-name">${escapeHTML(stock.name || "")}</div>
+          <div class="card-name">
+            <a href="${makeYutaiUrl(stock.code)}" target="_blank" rel="noopener noreferrer">
+              ${escapeHTML(stock.name || "")}
+            </a>
+          </div>
           <div class="card-code">
-            ${escapeHTML(stock.code || "")}
+            <a href="${makeYahooFinanceUrl(stock.code)}" target="_blank" rel="noopener noreferrer">
+              ${escapeHTML(stock.code || "")}
+            </a>
             ${stock.accountType ? `<span class="badge">${escapeHTML(stock.accountType)}</span>` : ""}
             ${stock.buyDate ? `<span class="badge">${escapeHTML(stock.buyDate)}</span>` : ""}
             ${stock.tag ? `<span class="badge">${escapeHTML(stock.tag)}</span>` : ""}

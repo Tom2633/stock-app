@@ -1,1 +1,8 @@
-v19: スマホでも上部固定。新規・編集フォームは折りたたみ式。通常時は操作ボタンと一覧を見やすく表示。
+株管理アプリ v20
+
+変更点:
+- 銘柄名クリックで96ut株主優待ページへ移動
+  https://96ut.com/stock/yutai.php?code=xxxx
+- コードクリックでYahoo!ファイナンスへ移動
+  https://finance.yahoo.co.jp/quote/xxxx.T
+- PC一覧とスマホカードの両方に対応

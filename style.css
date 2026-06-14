@@ -827,3 +827,31 @@ body {
     overflow-y: auto;
   }
 }
+
+
+/* =========================
+   v20 リンク表示
+========================= */
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+td a {
+  display: inline-block;
+  width: 100%;
+}
+
+.card-name a {
+  color: inherit;
+}
+
+.card-code a {
+  color: #555;
+  text-decoration: underline;
+}
