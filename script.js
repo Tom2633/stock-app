@@ -7,6 +7,7 @@ const sortBuyDateBtn = document.getElementById("sortBuyDateBtn");
 const sortCodeBtn = document.getElementById("sortCodeBtn");
 const sortProfitRateBtn = document.getElementById("sortProfitRateBtn");
 const clearAllBtn = document.getElementById("clearAllBtn");
+const toggleFormBtn = document.getElementById("toggleFormBtn");
 
 let stocks = JSON.parse(localStorage.getItem("stocks")) || [];
 let editingIndex = null;
@@ -21,6 +22,7 @@ sortBuyDateBtn.addEventListener("click", sortByBuyDateDesc);
 sortCodeBtn.addEventListener("click", sortByCodeAndRender);
 sortProfitRateBtn.addEventListener("click", sortByProfitRateAsc);
 clearAllBtn.addEventListener("click", clearAllStocks);
+toggleFormBtn.addEventListener("click", toggleForm);
 
 function saveStocks() {
   localStorage.setItem("stocks", JSON.stringify(stocks));
@@ -112,6 +114,26 @@ function sortByCodeAndRender() {
 function sortByProfitRateAsc() {
   currentSortMode = "profitRate";
   renderStocks();
+}
+
+
+function toggleForm() {
+  const inputArea = document.querySelector(".input-area");
+
+  inputArea.classList.toggle("form-open");
+
+  if (inputArea.classList.contains("form-open")) {
+    toggleFormBtn.textContent = "新規・編集フォーム ▲";
+  } else {
+    toggleFormBtn.textContent = "新規・編集フォーム ▼";
+  }
+}
+
+function openForm() {
+  const inputArea = document.querySelector(".input-area");
+
+  inputArea.classList.add("form-open");
+  toggleFormBtn.textContent = "新規・編集フォーム ▲";
 }
 
 function addStock() {
@@ -259,6 +281,7 @@ function editStock(index) {
 
   editingIndex = index;
   addBtn.textContent = "更新";
+  openForm();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
