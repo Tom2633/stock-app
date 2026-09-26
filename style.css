@@ -829,29 +829,10 @@ body {
 }
 
 
-/* =========================
-   v20 リンク表示
-========================= */
-
-a {
-  color: inherit;
-  text-decoration: none;
+/* 100株未満の銘柄をグレー表示 */
+tr.low-shares, tr.low-shares td, .card.low-shares {
+  background-color: #e2e2e2 !important;
 }
-
-a:hover {
-  text-decoration: underline;
-}
-
-td a {
-  display: inline-block;
-  width: 100%;
-}
-
-.card-name a {
-  color: inherit;
-}
-
-.card-code a {
-  color: #555;
-  text-decoration: underline;
-}
+tr.low-shares td, .card.low-shares { color: #666; }
+.search-area { display:flex; gap:8px; margin: 8px 0; }
+.search-area input { flex:1; min-width:0; background:#fff; }

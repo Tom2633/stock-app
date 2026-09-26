@@ -8,6 +8,8 @@ const sortCodeBtn = document.getElementById("sortCodeBtn");
 const sortProfitRateBtn = document.getElementById("sortProfitRateBtn");
 const clearAllBtn = document.getElementById("clearAllBtn");
 const toggleFormBtn = document.getElementById("toggleFormBtn");
+const stockSearch = document.getElementById("stockSearch");
+const clearSearchBtn = document.getElementById("clearSearchBtn");
 
 let stocks = JSON.parse(localStorage.getItem("stocks")) || [];
 let editingIndex = null;
@@ -23,15 +25,8 @@ sortCodeBtn.addEventListener("click", sortByCodeAndRender);
 sortProfitRateBtn.addEventListener("click", sortByProfitRateAsc);
 clearAllBtn.addEventListener("click", clearAllStocks);
 toggleFormBtn.addEventListener("click", toggleForm);
-
-
-function makeYutaiUrl(code) {
-  return `https://96ut.com/stock/yutai.php?code=${encodeURIComponent(code || "")}`;
-}
-
-function makeYahooFinanceUrl(code) {
-  return `https://finance.yahoo.co.jp/quote/${encodeURIComponent(code || "")}.T`;
-}
+stockSearch.addEventListener("input", renderStocks);
+clearSearchBtn.addEventListener("click", () => { stockSearch.value = ""; renderStocks(); });
 
 function saveStocks() {
   localStorage.setItem("stocks", JSON.stringify(stocks));
@@ -203,7 +198,10 @@ function renderStocks() {
 
   let total = 0;
 
+  const query = (stockSearch?.value || "").trim().toLocaleLowerCase();
   stocks.forEach((stock, index) => {
+    const searchable = `${stock.name || ""} ${stock.code || ""}`.toLocaleLowerCase();
+    if (query && !searchable.includes(query)) return;
     const shares = Number(stock.shares);
     const buyPrice = Number(stock.buyPrice);
     const currentPrice = Number(stock.currentPrice);
@@ -214,18 +212,12 @@ function renderStocks() {
     total += profit;
     const plusMinus = profit >= 0 ? "plus" : "minus";
 
+    const lowShares = shares < 100;
     const tr = document.createElement("tr");
+    if (lowShares) tr.classList.add("low-shares");
     tr.innerHTML = `
-      <td>
-        <a href="${makeYahooFinanceUrl(stock.code)}" target="_blank" rel="noopener noreferrer">
-          ${escapeHTML(stock.code || "")}
-        </a>
-      </td>
-      <td>
-        <a href="${makeYutaiUrl(stock.code)}" target="_blank" rel="noopener noreferrer">
-          ${escapeHTML(stock.name || "")}
-        </a>
-      </td>
+      <td>${escapeHTML(stock.code || "")}</td>
+      <td>${escapeHTML(stock.name || "")}</td>
       <td>${escapeHTML(stock.accountType || "")}</td>
       <td>${escapeHTML(stock.buyDate || "")}</td>
       <td>${shares.toLocaleString()}</td>
@@ -243,19 +235,13 @@ function renderStocks() {
     stockTable.appendChild(tr);
 
     const card = document.createElement("div");
-    card.className = "card";
+    card.className = lowShares ? "card low-shares" : "card";
     card.innerHTML = `
       <div class="card-top">
         <div>
-          <div class="card-name">
-            <a href="${makeYutaiUrl(stock.code)}" target="_blank" rel="noopener noreferrer">
-              ${escapeHTML(stock.name || "")}
-            </a>
-          </div>
+          <div class="card-name">${escapeHTML(stock.name || "")}</div>
           <div class="card-code">
-            <a href="${makeYahooFinanceUrl(stock.code)}" target="_blank" rel="noopener noreferrer">
-              ${escapeHTML(stock.code || "")}
-            </a>
+            ${escapeHTML(stock.code || "")}
             ${stock.accountType ? `<span class="badge">${escapeHTML(stock.accountType)}</span>` : ""}
             ${stock.buyDate ? `<span class="badge">${escapeHTML(stock.buyDate)}</span>` : ""}
             ${stock.tag ? `<span class="badge">${escapeHTML(stock.tag)}</span>` : ""}
